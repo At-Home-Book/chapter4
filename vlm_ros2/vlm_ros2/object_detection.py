@@ -10,10 +10,10 @@ from openai import OpenAI
 
 photo_taken = False
 
-class ImageRecognition(Node):
+class ObjectDetection(Node):
 
     def __init__(self):
-        super().__init__('image_recognition')
+        super().__init__('object_detection')
 
         self.client = OpenAI(
             # This is the default and can be omitted
@@ -43,7 +43,7 @@ class ImageRecognition(Node):
             self.get_logger().error('cv_bridge exception: %s' % e)
 
     def get_response(self):
-        prompt = "What is in this image?"
+        prompt = "Use boxes to locate each object in the image and describe its characteristics. Output the coordinates of all bboxes in JSON format. Do not output the ```json``` code segment."
         with open("photo.png", "rb") as image_file:
             b64_image = base64.b64encode(image_file.read()).decode("utf-8")
 
@@ -65,11 +65,11 @@ class ImageRecognition(Node):
 def main(args=None):
     rclpy.init(args=args)
 
-    image_recognition = ImageRecognition()
+    object_detection = ObjectDetection()
 
-    rclpy.spin(image_recognition)
+    rclpy.spin(object_detection)
 
-    image_recognition.destroy_node()
+    object_detection.destroy_node()
 
     rclpy.shutdown()
 
