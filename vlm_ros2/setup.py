@@ -13,7 +13,7 @@ setup(
     ],
     install_requires=['setuptools'],
     zip_safe=True,
-    maintainer='Jeffrey Too Chuan TAN',
+    maintainer='Jeffrey Tan',
     maintainer_email='at-home-book@googlegroups.com',
     description='Vision-Language Model applications with ROS 2',
     license='Apache License 2.0',
