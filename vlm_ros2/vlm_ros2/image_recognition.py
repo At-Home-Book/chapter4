@@ -42,7 +42,6 @@ class ImageRecognition(Node):
         except Exception as e:
             self.get_logger().error('cv_bridge exception: %s' % e)
 
-
     def get_response(self):
         prompt = "What is in this image?"
         with open("photo.png", "rb") as image_file:
@@ -78,7 +77,6 @@ def main(args=None):
     image_recognition.destroy_node()
 
     rclpy.shutdown()
-
 
 if __name__ == '__main__':
     main()
