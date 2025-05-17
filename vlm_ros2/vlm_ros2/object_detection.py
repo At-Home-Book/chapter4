@@ -81,7 +81,7 @@ class ObjectDetection(Node):
             # Draw rectangle
             cv2.rectangle(image, (x_min, y_min), (x_max, y_max), color, 2)
             
-            # Optional: Put label text above the bounding box
+            # Put label text above the bounding box
             font = cv2.FONT_HERSHEY_SIMPLEX
             cv2.putText(image, label, (x_min, y_min - 10), font, 0.5, color, 2)
 

@@ -22,6 +22,7 @@ setup(
         'console_scripts': [
             'image_recognition = vlm_ros2.image_recognition:main',
             'object_detection = vlm_ros2.object_detection:main',
+            'signage_recognition = vlm_ros2.signage_recognition:main',
         ],
     },
 )
