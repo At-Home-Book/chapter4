@@ -17,10 +17,9 @@ class ObjectDetection(Node):
         super().__init__('object_detection')
 
         self.client = OpenAI(
-            #api_key=os.environ.get("OPENAI_API_KEY"),
-            #base_url="https://api.openai.com/v1",
-            api_key=os.getenv('DASHSCOPE_API_KEY'),
-            base_url="https://dashscope.aliyuncs.com/compatible-mode/v1",
+            # Set API Key and Base URL
+            api_key=os.environ.get("OPENAI_API_KEY"),
+            base_url="https://api.openai.com/v1",
         )
         
         self.bridge = CvBridge()
@@ -39,18 +38,20 @@ class ObjectDetection(Node):
                 photo_taken = True
                 self.get_logger().info("The photo is taken.")
                 # Get response from VLM
+                self.get_logger().info("Getting response from VLM...")
                 self.get_response()
         except Exception as e:
             self.get_logger().error('cv_bridge exception: %s' % e)
 
     def get_response(self):
-        prompt = "Use bounding boxes to locate each object in the image. Output the coordinates of all bounding boxes with the object labels in JSON format. Show only the final JSON output without the ```json```."
+        # Input text
+        prompt = "Use bounding box to locate each object in the image. Output the coordinates of all bounding boxes with the object labels in JSON format. Use bbox_2d as the name of the bounding boxes. Use objects as the name of the JSON. Show only the final JSON output without the ```json```."
         with open("photo.png", "rb") as image_file:
             base64_image = base64.b64encode(image_file.read()).decode("utf-8")
 
         completion = self.client.chat.completions.create(
-            #model="gpt-4o-mini",
-            model="qwen-vl-max-latest",
+            # Set Model
+            model="gpt-4.1-mini",
             messages=[
                 {
                     "role": "user",

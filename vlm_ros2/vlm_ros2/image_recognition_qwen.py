@@ -17,8 +17,8 @@ class ImageRecognition(Node):
 
         self.client = OpenAI(
             # Set API Key and Base URL
-            api_key=os.environ.get("OPENAI_API_KEY"),
-            base_url="https://api.openai.com/v1",
+            api_key=os.getenv('DASHSCOPE_API_KEY'),
+            base_url="https://dashscope.aliyuncs.com/compatible-mode/v1",
         )
         
         self.bridge = CvBridge()
@@ -52,7 +52,7 @@ class ImageRecognition(Node):
 
         completion = self.client.chat.completions.create(
             # Set Model
-            model="gpt-4.1-mini",
+            model="qwen-vl-max-latest",
             messages=[
                 {
                     "role": "user",

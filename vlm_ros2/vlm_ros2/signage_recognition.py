@@ -16,10 +16,9 @@ class SignageRecognition(Node):
         super().__init__('signage_recognition')
 
         self.client = OpenAI(
-            #api_key=os.environ.get("OPENAI_API_KEY"),
-            #base_url="https://api.openai.com/v1",
-            api_key=os.getenv('DASHSCOPE_API_KEY'),
-            base_url="https://dashscope.aliyuncs.com/compatible-mode/v1",
+            # Set API Key and Base URL
+            api_key=os.environ.get("OPENAI_API_KEY"),
+            base_url="https://api.openai.com/v1",
         )
         
         self.bridge = CvBridge()
@@ -38,18 +37,21 @@ class SignageRecognition(Node):
                 photo_taken = True
                 self.get_logger().info("The photo is taken.")
                 # Get response from VLM
+                self.get_logger().info("Getting response from VLM...")
                 self.get_response()
         except Exception as e:
             self.get_logger().error('cv_bridge exception: %s' % e)
 
     def get_response(self):
-        prompt = "What is the signage in this image?"
-        with open("signage.jpeg", "rb") as image_file:
+        # Input text
+        #prompt = "What is the signage in this image?"
+        prompt = "Can you show me the direction from Hakoneyama Hill to Toyana Park Service Center?"
+        with open("photo.png", "rb") as image_file:
             base64_image = base64.b64encode(image_file.read()).decode("utf-8")
 
         completion = self.client.chat.completions.create(
-            #model="gpt-4o-mini",
-            model="qwen-vl-max-latest",
+            # Set Model
+            model="gpt-4.1-mini",
             messages=[
                 {
                     "role": "user",
@@ -62,7 +64,7 @@ class SignageRecognition(Node):
         )
 
         self.get_logger().info(completion.choices[0].message.content)
-        cv_photo = cv2.imread("signage.jpeg")
+        cv_photo = cv2.imread("photo.png")
         cv2.imshow('Photo',cv_photo)
         cv2.waitKey(0)
         cv2.destroyAllWindows()

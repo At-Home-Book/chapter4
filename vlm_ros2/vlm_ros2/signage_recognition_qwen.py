@@ -10,15 +10,15 @@ from openai import OpenAI
 
 photo_taken = False
 
-class ImageRecognition(Node):
+class SignageRecognition(Node):
 
     def __init__(self):
-        super().__init__('image_recognition')
+        super().__init__('signage_recognition')
 
         self.client = OpenAI(
             # Set API Key and Base URL
-            api_key=os.environ.get("OPENAI_API_KEY"),
-            base_url="https://api.openai.com/v1",
+            api_key=os.getenv('DASHSCOPE_API_KEY'),
+            base_url="https://dashscope.aliyuncs.com/compatible-mode/v1",
         )
         
         self.bridge = CvBridge()
@@ -44,15 +44,13 @@ class ImageRecognition(Node):
 
     def get_response(self):
         # Input text
-        prompt = "What is in this image?"
-        #prompt = "How many fruits are there in this image?"
-        #prompt = "What are the objects that can be used to drink water in this image?"
+        prompt = "What is the signage in this image?"
         with open("photo.png", "rb") as image_file:
             base64_image = base64.b64encode(image_file.read()).decode("utf-8")
 
         completion = self.client.chat.completions.create(
             # Set Model
-            model="gpt-4.1-mini",
+            model="qwen-vl-max-latest",
             messages=[
                 {
                     "role": "user",
@@ -73,11 +71,11 @@ class ImageRecognition(Node):
 def main(args=None):
     rclpy.init(args=args)
 
-    image_recognition = ImageRecognition()
+    signage_recognition = SignageRecognition()
 
-    rclpy.spin(image_recognition)
+    rclpy.spin(signage_recognition)
 
-    image_recognition.destroy_node()
+    signage_recognition.destroy_node()
 
     rclpy.shutdown()
 

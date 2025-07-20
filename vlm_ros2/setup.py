@@ -21,8 +21,11 @@ setup(
     entry_points={
         'console_scripts': [
             'image_recognition = vlm_ros2.image_recognition:main',
+            'image_recognition_qwen = vlm_ros2.image_recognition_qwen:main',
             'object_detection = vlm_ros2.object_detection:main',
+            'object_detection_qwen = vlm_ros2.object_detection_qwen:main',
             'signage_recognition = vlm_ros2.signage_recognition:main',
+            'signage_recognition_qwen = vlm_ros2.signage_recognition_qwen:main',
         ],
     },
 )

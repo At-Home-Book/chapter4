@@ -7,18 +7,19 @@ from cv_bridge import CvBridge
 import os
 import base64
 from openai import OpenAI
+import json
 
 photo_taken = False
 
-class ImageRecognition(Node):
+class ObjectDetection(Node):
 
     def __init__(self):
-        super().__init__('image_recognition')
+        super().__init__('object_detection')
 
         self.client = OpenAI(
             # Set API Key and Base URL
-            api_key=os.environ.get("OPENAI_API_KEY"),
-            base_url="https://api.openai.com/v1",
+            api_key=os.getenv('DASHSCOPE_API_KEY'),
+            base_url="https://dashscope.aliyuncs.com/compatible-mode/v1",
         )
         
         self.bridge = CvBridge()
@@ -44,15 +45,13 @@ class ImageRecognition(Node):
 
     def get_response(self):
         # Input text
-        prompt = "What is in this image?"
-        #prompt = "How many fruits are there in this image?"
-        #prompt = "What are the objects that can be used to drink water in this image?"
+        prompt = "Use bounding box to locate each object in the image. Output the coordinates of all bounding boxes with the object labels in JSON format. Use bbox_2d as the name of the bounding boxes. Use objects as the name of the JSON. Show only the final JSON output without the ```json```."
         with open("photo.png", "rb") as image_file:
             base64_image = base64.b64encode(image_file.read()).decode("utf-8")
 
         completion = self.client.chat.completions.create(
             # Set Model
-            model="gpt-4.1-mini",
+            model="qwen-vl-max-latest",
             messages=[
                 {
                     "role": "user",
@@ -64,20 +63,43 @@ class ImageRecognition(Node):
             ],
         )
 
-        self.get_logger().info(completion.choices[0].message.content)
-        cv_photo = cv2.imread("photo.png")
-        cv2.imshow('Photo',cv_photo)
+        self.result = completion.choices[0].message.content
+        self.get_logger().info(self.result)
+        self.update_photo()
+
+    def update_photo(self):
+        data = json.loads(self.result)
+        objects = data["objects"]
+        image = cv2.imread("photo.png")
+
+        for obj in objects:
+            bbox = obj['bbox_2d']
+            label = obj['label']
+            
+            x_min, y_min, x_max, y_max = bbox
+            color = (255, 0, 0)
+            
+            # Draw rectangle
+            cv2.rectangle(image, (x_min, y_min), (x_max, y_max), color, 2)
+            
+            # Put label text above the bounding box
+            font = cv2.FONT_HERSHEY_SIMPLEX
+            cv2.putText(image, label, (x_min, y_min - 10), font, 0.5, color, 2)
+
+        # Save and display output
+        cv2.imwrite('output_photo.png', image)
+        cv2.imshow('Annotated Image', image)
         cv2.waitKey(0)
         cv2.destroyAllWindows()
 
 def main(args=None):
     rclpy.init(args=args)
 
-    image_recognition = ImageRecognition()
+    object_detection = ObjectDetection()
 
-    rclpy.spin(image_recognition)
+    rclpy.spin(object_detection)
 
-    image_recognition.destroy_node()
+    object_detection.destroy_node()
 
     rclpy.shutdown()
 
